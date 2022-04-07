@@ -15,7 +15,7 @@ public class GatewayConfig {
     AuthenticationFilter filter;
 
     @Bean
-    public RouteLocator routes(RouteLocatorBuilder builder){
+    public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("user-service", r -> r.path("/users/**")
                         .filters(f -> f.filter(filter))

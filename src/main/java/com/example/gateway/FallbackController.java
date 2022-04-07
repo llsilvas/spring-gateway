@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FallbackController {
 
     @GetMapping("/fallback1")
-    public String userFallback(){
+    public String userFallback() {
         return "User service is not available";
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.nio.charset.Charset;
 import java.security.Key;
 import java.util.Date;
 
@@ -20,7 +21,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(Charset.forName("UTF-8")));
     }
 
     public Claims getAllClaimsFromToken(String token) {
@@ -34,5 +35,4 @@ public class JwtUtil {
     public boolean isInvalid(String token) {
         return this.isTokenExpired(token);
     }
-
 }
