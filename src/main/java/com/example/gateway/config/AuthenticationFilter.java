@@ -2,6 +2,7 @@ package com.example.gateway.config;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -9,15 +10,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
 @RefreshScope
 public class AuthenticationFilter implements GatewayFilter {
-    
+
     private RouteValidator routerValidator;
     private JwtUtil jwtUtil;
+
+    @Value("${saog.autentica.url.valida-token}")
+    private String urlResource;
 
     @Autowired
     public AuthenticationFilter(RouteValidator routerValidator, JwtUtil jwtUtil) {
@@ -35,12 +40,17 @@ public class AuthenticationFilter implements GatewayFilter {
 
             final String token = this.getAuthHeader(request);
 
-            if (jwtUtil.isInvalid(token))
+            if (!valido(token))
                 return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
 
             this.populateRequestWithHeaders(exchange, token);
         }
         return chain.filter(exchange);
+    }
+
+    private boolean valido(String token) {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(urlResource + token, Boolean.class);
     }
 
     private String getAuthHeader(ServerHttpRequest request) {
